@@ -1,0 +1,92 @@
+import React, { useState, useCallback } from 'react';
+import { GameState, OperationType, type PracticeSettings, type AllPracticeSettings, type PracticeStat, type FinalStats, ALL_OPERATIONS } from './types';
+import Header from './components/Header';
+import SettingsForm, { initialGlobalSettings } from './components/SettingsForm';
+import PracticeScreen from './components/PracticeScreen';
+import ResultsScreen from './components/ResultsScreen';
+
+const App: React.FC = () => {
+  const [gameState, setGameState] = useState<GameState>(GameState.SETTINGS);
+  const [activeOperations, setActiveOperations] = useState<OperationType[] | null>(null);
+  const [activePracticeAllSettings, setActivePracticeAllSettings] = useState<AllPracticeSettings | null>(null);
+  const [allSettings, setAllSettings] = useState<AllPracticeSettings>(initialGlobalSettings);
+  
+  const [finalStats, setFinalStats] = useState<FinalStats | null>(null);
+  const [detailedPracticeStats, setDetailedPracticeStats] = useState<PracticeStat[]>([]);
+
+  const handleStartPractice = useCallback((operations: OperationType[], settings: AllPracticeSettings) => {
+    setActiveOperations(operations);
+    setActivePracticeAllSettings(settings);
+    setAllSettings(settings); // Keep global settings state updated
+    setGameState(GameState.PRACTICING);
+  }, []);
+
+  const handleEndPractice = useCallback((practiceData: PracticeStat[], totalTimeMs: number) => {
+    const totalQuestions = practiceData.length;
+    const correctAnswers = practiceData.filter(stat => stat.isCorrect).length;
+    const incorrectAnswers = totalQuestions - correctAnswers;
+    const accuracy = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
+    const avgTimePerQuestionMs = totalQuestions > 0 ? Math.round(totalTimeMs / totalQuestions) : 0;
+
+    setFinalStats({
+      totalQuestions,
+      correctAnswers,
+      incorrectAnswers,
+      accuracy,
+      totalPracticeTimeMs: totalTimeMs,
+      avgTimePerQuestionMs,
+    });
+    setDetailedPracticeStats(practiceData);
+    setGameState(GameState.RESULTS);
+  }, []);
+
+  const handleRestartSameSettings = useCallback(() => {
+    if (activeOperations && activeOperations.length > 0 && activePracticeAllSettings) {
+      setGameState(GameState.PRACTICING);
+    } else {
+      // Fallback if state is inconsistent
+      setGameState(GameState.SETTINGS);
+    }
+  }, [activeOperations, activePracticeAllSettings]);
+
+  const handleGoToSettings = useCallback(() => {
+    setGameState(GameState.SETTINGS);
+  }, []);
+
+  const renderContent = () => {
+    switch (gameState) {
+      case GameState.SETTINGS:
+        return <SettingsForm initialSettings={allSettings} onStartPractice={handleStartPractice} />;
+      case GameState.PRACTICING:
+        if (activeOperations && activeOperations.length > 0 && activePracticeAllSettings) {
+          return <PracticeScreen operations={activeOperations} allSettings={activePracticeAllSettings} onEndPractice={handleEndPractice} />;
+        }
+        // Fallback if state is inconsistent
+        setGameState(GameState.SETTINGS); 
+        return <SettingsForm initialSettings={allSettings} onStartPractice={handleStartPractice} />;
+      case GameState.RESULTS:
+        if (finalStats) {
+          return <ResultsScreen stats={finalStats} detailedStats={detailedPracticeStats} onRestartSameSettings={handleRestartSameSettings} onGoToSettings={handleGoToSettings} />;
+        }
+        // Fallback if stats are missing
+        setGameState(GameState.SETTINGS);
+        return <SettingsForm initialSettings={allSettings} onStartPractice={handleStartPractice} />;
+      default:
+        return <p>Loading...</p>;
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
+        {renderContent()}
+      </main>
+      <footer className="text-center py-4 text-sm text-slate-500">
+        <p>&copy; {new Date().getFullYear()} Math Whiz Practice. Sharpen Your Skills!</p>
+      </footer>
+    </div>
+  );
+};
+
+export default App;
