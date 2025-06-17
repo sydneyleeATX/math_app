@@ -45,5 +45,7 @@
     <p>Please enable JavaScript to use Math Whiz Practice.</p>
     <p>If you are seeing this, it might also mean that the Service Worker failed to register, which is needed for offline capabilities.</p>
   </noscript>
+  {/*ensures the DOM is loaded before your React app tries to mount*/}
+  <script type="module" src="/src/index.tsx"></script>
 </body>
 </html>

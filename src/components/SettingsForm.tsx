@@ -196,7 +196,7 @@ const SettingsForm: React.FC<SettingsFormProps> = ({ initialSettings, onStartPra
                       <input type="number" id={`${op}-frac-num-upper`} value={opSettings.fractionNumeratorUpper ?? ''} onChange={e => handleInputChange(op, 'fractionNumeratorUpper', e.target.value)} className="number-input mt-1 block w-full p-2 border-gray-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500 sm:text-sm"/>
                     </div>
                   </div>
-                  <p className="text-xs text-gray-500 mt-3 mb-2">Denominator limits (must be > 0):</p>
+                  <p className="text-xs text-gray-500 mt-3 mb-2">Denominator limits (must be &gt; 0):</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label htmlFor={`${op}-frac-den-lower`} className="block text-sm font-medium text-gray-700">Lower</label>
@@ -212,7 +212,7 @@ const SettingsForm: React.FC<SettingsFormProps> = ({ initialSettings, onStartPra
         case OperationType.SQUARE_ROOT:
             return (
                 <>
-                  <p className="text-xs text-gray-500 mb-2 mt-1">Radicand (number under root) limits (must be > 0):</p>
+                  <p className="text-xs text-gray-500 mb-2 mt-1">Radicand (number under root) limits (must be &gt; 0):</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label htmlFor={`${op}-sqrt-lower`} className="block text-sm font-medium text-gray-700">Lower</label>

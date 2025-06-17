@@ -5,8 +5,32 @@ import SettingsForm, { initialGlobalSettings } from './components/SettingsForm';
 import PracticeScreen from './components/PracticeScreen';
 import ResultsScreen from './components/ResultsScreen';
 
+// ErrorBoundary for catching runtime errors
+class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: any}> {
+  constructor(props: {children: React.ReactNode}) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error: any) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error: any, info: any) {
+    console.error('[ErrorBoundary] Caught error:', error, info);
+  }
+  render() {
+    if (this.state.hasError) {
+      return <div style={{color: 'red', padding: 20}}>
+        <h2>Something went wrong.</h2>
+        <pre>{String(this.state.error)}</pre>
+      </div>;
+    }
+    return this.props.children;
+  }
+}
+
 const App: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>(GameState.SETTINGS);
+  console.log('[DEBUG] App rendering, gameState:', gameState);
   const [activeOperations, setActiveOperations] = useState<OperationType[] | null>(null);
   const [activePracticeAllSettings, setActivePracticeAllSettings] = useState<AllPracticeSettings | null>(null);
   const [allSettings, setAllSettings] = useState<AllPracticeSettings>(initialGlobalSettings);
@@ -54,6 +78,8 @@ const App: React.FC = () => {
   }, []);
 
   const renderContent = () => {
+    console.log('[DEBUG] renderContent called, gameState:', gameState);
+    
     switch (gameState) {
       case GameState.SETTINGS:
         return <SettingsForm initialSettings={allSettings} onStartPractice={handleStartPractice} />;
@@ -77,15 +103,17 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
-        {renderContent()}
-      </main>
-      <footer className="text-center py-4 text-sm text-slate-500">
-        <p>&copy; {new Date().getFullYear()} Math Whiz Practice. Sharpen Your Skills!</p>
-      </footer>
-    </div>
+    <ErrorBoundary>
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
+          {renderContent()}
+        </main>
+        <footer className="text-center py-4 text-sm text-slate-500">
+          <p>&copy; {new Date().getFullYear()} Math Whiz Practice. Sharpen Your Skills!</p>
+        </footer>
+      </div>
+    </ErrorBoundary>
   );
 };
 
