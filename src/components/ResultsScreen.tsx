@@ -1,6 +1,7 @@
 import React from 'react';
 import { type FinalStats, type PracticeStat, type Answer, type FractionType } from '../types';
 import { formatAnswer } from '../utils/mathHelpers';
+import { OperationType } from '../types';
 import VerticalFraction from './VerticalFraction';
 
 interface ResultsScreenProps {
@@ -29,11 +30,11 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ stats, detailedStats, onR
     return typeof part === 'object' && part !== null && 'numerator' in part;
   }
 
-  const renderAnswer = (answer: Answer, decimalPlaces?: number) => {
+  const renderAnswer = (answer: Answer, decimalPlaces?: number, showFullPrecision?: boolean) => {
     if (isAnswerFraction(answer)) {
       return <VerticalFraction fraction={answer} />;
     }
-    return formatAnswer(answer, decimalPlaces);
+    return formatAnswer(answer, decimalPlaces, showFullPrecision);
   };
 
   const renderQuestionParts = (parts: (string | FractionType)[]) => {
@@ -90,7 +91,7 @@ const ResultsScreen: React.FC<ResultsScreenProps> = ({ stats, detailedStats, onR
                 <p className="text-xs">
                   Your answer: {renderAnswer(stat.userAnswer, stat.question.decimalPlaces)} 
                   {!stat.isCorrect && (
-                    <> (Incorrect, Correct: {renderAnswer(stat.question.correctAnswer, stat.question.decimalPlaces)})</>
+                    <> (Incorrect, Correct: {renderAnswer(stat.question.correctAnswer, stat.question.decimalPlaces, stat.question.operation === OperationType.DECIMALS)})</>
                   )}
                   {stat.isCorrect && " (Correct)"}
                 </p>

@@ -12,6 +12,10 @@ function getRandomFloat(min: number, max: number, decimalPlaces: number): number
   return Math.round(value * factor) / factor;
 }
 
+export function getDisplayDecimalPlaces(decimalPlaces: number): number {
+  return Math.max(2, decimalPlaces * 2); // Always at least 2 for safety
+}
+
 
 function shuffleArray<T,>(array: T[]): T[] {
   const newArray = [...array];
@@ -44,8 +48,14 @@ export function simplifyFraction(num: number, den: number): FractionType {
   return { numerator: simplifiedNum, denominator: simplifiedDen };
 }
 
-export function formatAnswer(answer: Answer, fixedDecimalPlaces?: number): string {
+export function formatAnswer(answer: Answer, fixedDecimalPlaces?: number, showFullPrecision?: boolean): string {
+  // Always round decimal operation answers to the given decimal places, even for 'full precision' mode
+
   if (typeof answer === 'number') {
+    if (showFullPrecision) {
+      // Show full precision, avoid unnecessary rounding
+      return answer.toString();
+    }
     if (fixedDecimalPlaces !== undefined && fixedDecimalPlaces !== null) {
       return answer.toFixed(fixedDecimalPlaces);
     }
@@ -337,7 +347,7 @@ export function generateQuestion(operationType: OperationType, settings: Practic
       break;
     }
     case OperationType.DECIMALS: {
-      questionDecimalPlaces = Math.max(1, Math.min(5, decimalPlaces)); 
+      questionDecimalPlaces = Math.max(1, Math.min(5, decimalPlaces));
       const num1 = getRandomFloat(lower, upper, questionDecimalPlaces);
       const num2 = getRandomFloat(lower, upper, questionDecimalPlaces);
       
@@ -350,9 +360,13 @@ export function generateQuestion(operationType: OperationType, settings: Practic
         case '-': calcResult = num1 - num2; break;
         case '×': calcResult = num1 * num2; break;
       }
-      correctAnswer = parseFloat(calcResult.toFixed(questionDecimalPlaces));
+      const displayDecimalPlaces = getDisplayDecimalPlaces(questionDecimalPlaces);
+      const roundedCorrect = Number(calcResult.toFixed(displayDecimalPlaces));
+      const distractors = generateDecimalDistractors(roundedCorrect, numDistractors, displayDecimalPlaces);
+      const filteredDistractors = distractors.filter((d: number) => Math.abs(d - roundedCorrect) > Math.pow(10, -displayDecimalPlaces));
+      choices = shuffleArray([roundedCorrect, ...filteredDistractors]);
+      correctAnswer = roundedCorrect; 
       questionParts = [`${num1.toFixed(questionDecimalPlaces)} ${op} ${num2.toFixed(questionDecimalPlaces)} = ?`];
-      choices = [correctAnswer, ...generateDecimalDistractors(correctAnswer, numDistractors, questionDecimalPlaces)];
       break;
     }
     default:

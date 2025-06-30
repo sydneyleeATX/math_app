@@ -1,6 +1,6 @@
 import React from 'react';
 import { type Question, type Answer, type FractionType } from '../types';
-import { formatAnswer } from '../utils/mathHelpers';
+import { formatAnswer, getDisplayDecimalPlaces } from '../utils/mathHelpers';
 import VerticalFraction from './VerticalFraction';
 
 interface QuestionCardProps {
@@ -52,7 +52,13 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question, onAnswerSelect })
               {isFraction(choice) ? (
                 <VerticalFraction fraction={choice} />
               ) : (
-                formatAnswer(choice, question.decimalPlaces)
+                formatAnswer(
+                  choice,
+                  question.decimalPlaces && question.operation === 'Decimal Operations'
+                    ? getDisplayDecimalPlaces(question.decimalPlaces)
+                    : question.decimalPlaces,
+                  question.correctAnswer === choice
+                )
               )}
             </span>
           </button>
