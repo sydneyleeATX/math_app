@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { OperationType, type AllPracticeSettings, type PracticeSettings, ALL_OPERATIONS } from '../types';
 
 interface SettingsFormProps {
@@ -28,6 +28,11 @@ const defaultSettingsForOperation = (op: OperationType): PracticeSettings => {
 const SettingsForm: React.FC<SettingsFormProps> = ({ initialSettings, onStartPractice }) => {
   const [currentSettings, setCurrentSettings] = useState<AllPracticeSettings>(initialSettings);
   const [selectedOperations, setSelectedOperations] = useState<OperationType[]>([ALL_OPERATIONS[0]]);
+
+  // Sync currentSettings with initialSettings when prop changes
+  useEffect(() => {
+    setCurrentSettings(initialSettings);
+  }, [initialSettings]);
 
   const handleOperationToggle = (opToToggle: OperationType) => {
     setSelectedOperations(prev =>

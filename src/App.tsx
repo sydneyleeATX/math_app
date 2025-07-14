@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { GameState, OperationType, type PracticeSettings, type AllPracticeSettings, type PracticeStat, type FinalStats, ALL_OPERATIONS } from './types';
 import Header from './components/Header';
 import SettingsForm, { initialGlobalSettings } from './components/SettingsForm';
@@ -28,15 +28,24 @@ class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasErr
   }
 }
 
+
 const App: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>(GameState.SETTINGS);
   console.log('[DEBUG] App rendering, gameState:', gameState);
   const [activeOperations, setActiveOperations] = useState<OperationType[] | null>(null);
   const [activePracticeAllSettings, setActivePracticeAllSettings] = useState<AllPracticeSettings | null>(null);
-  const [allSettings, setAllSettings] = useState<AllPracticeSettings>(initialGlobalSettings);
+  const savedSettings = localStorage.getItem('mathAppSettings');
+const [allSettings, setAllSettings] = useState<AllPracticeSettings>(
+  savedSettings ? JSON.parse(savedSettings) : initialGlobalSettings
+);
   
   const [finalStats, setFinalStats] = useState<FinalStats | null>(null);
   const [detailedPracticeStats, setDetailedPracticeStats] = useState<PracticeStat[]>([]);
+
+  // Persist settings to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('mathAppSettings', JSON.stringify(allSettings));
+  }, [allSettings]);
 
   const handleStartPractice = useCallback((operations: OperationType[], settings: AllPracticeSettings) => {
     setActiveOperations(operations);
