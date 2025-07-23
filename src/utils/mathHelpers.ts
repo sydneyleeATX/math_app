@@ -221,7 +221,11 @@ export function generateQuestion(operationType: OperationType, settings: Practic
     exponentPowerLower = 0, exponentPowerUpper = 3,
     fractionNumeratorLower = 1, fractionNumeratorUpper = 10,
     fractionDenominatorLower = 2, fractionDenominatorUpper = 10,
-    decimalPlaces = 1, 
+    decimalPlaces = 1,
+    decimalAdditionPlaces,
+    decimalSubtractionPlaces,
+    decimalMultiplicationPlaces,
+    decimalDivisionPlaces,
   } = settings;
 
 
@@ -335,31 +339,56 @@ export function generateQuestion(operationType: OperationType, settings: Practic
       break;
     }
     case OperationType.SQUARE_ROOT: {
-      const radicandLower = Math.max(1, lower);
-      const radicandUpper = Math.max(radicandLower + 1, upper); 
-      const radicand = getRandomInt(radicandLower, radicandUpper);
-      const actualRoot = Math.sqrt(radicand);
+      // Generate whole number answers by working backwards from perfect squares
+      const rootLower = Math.max(1, Math.ceil(Math.sqrt(Math.max(1, lower))));
+      const rootUpper = Math.max(rootLower, Math.floor(Math.sqrt(Math.max(rootLower * rootLower, upper))));
       
-      correctAnswer = parseFloat(actualRoot.toFixed(1));
+      // Ensure we have a valid range for roots
+      const actualRootLower = Math.max(1, rootLower);
+      const actualRootUpper = Math.max(actualRootLower, rootUpper);
+      
+      // Generate a random whole number root
+      const wholeRoot = getRandomInt(actualRootLower, actualRootUpper);
+      const radicand = wholeRoot * wholeRoot; // This ensures a perfect square
+      
+      correctAnswer = wholeRoot; // The answer is always a whole number
       questionParts = [`√${radicand} = ?`];
-      questionDecimalPlaces = 1; 
-      choices = [correctAnswer, ...generateSquareRootDistractors(actualRoot, numDistractors)];
+      choices = [correctAnswer, ...generateNumericDistractors(correctAnswer, numDistractors)];
       break;
     }
     case OperationType.DECIMALS: {
-      questionDecimalPlaces = Math.max(1, Math.min(5, decimalPlaces));
-      const num1 = getRandomFloat(lower, upper, questionDecimalPlaces);
-      const num2 = getRandomFloat(lower, upper, questionDecimalPlaces);
+      // Define available operations with their corresponding decimal place settings
+      const availableOps = [
+        { symbol: '+', decimalPlaces: decimalAdditionPlaces ?? decimalPlaces ?? 1 },
+        { symbol: '-', decimalPlaces: decimalSubtractionPlaces ?? decimalPlaces ?? 1 },
+        { symbol: '×', decimalPlaces: decimalMultiplicationPlaces ?? decimalPlaces ?? 1 },
+        { symbol: '÷', decimalPlaces: decimalDivisionPlaces ?? decimalPlaces ?? 1 }
+      ];
       
-      const ops = ['+', '-', '×'] as const;
-      const op = ops[getRandomInt(0, ops.length - 1)];
+      // Select a random operation
+      const selectedOp = availableOps[getRandomInt(0, availableOps.length - 1)];
+      const op = selectedOp.symbol;
+      questionDecimalPlaces = Math.max(1, Math.min(5, selectedOp.decimalPlaces));
+      
+      const num1 = getRandomFloat(lower, upper, questionDecimalPlaces);
+      let num2 = getRandomFloat(lower, upper, questionDecimalPlaces);
+      
+      // Ensure num2 is not zero for division
+      if (op === '÷') {
+        while (Math.abs(num2) < 0.1) {
+          num2 = getRandomFloat(Math.max(0.1, lower), upper, questionDecimalPlaces);
+        }
+      }
+      
       let calcResult: number;
-
       switch (op) {
         case '+': calcResult = num1 + num2; break;
         case '-': calcResult = num1 - num2; break;
         case '×': calcResult = num1 * num2; break;
+        case '÷': calcResult = num1 / num2; break;
+        default: calcResult = num1 + num2; break; // Fallback, should never happen
       }
+      
       const displayDecimalPlaces = getDisplayDecimalPlaces(questionDecimalPlaces);
       const roundedCorrect = Number(calcResult.toFixed(displayDecimalPlaces));
       const distractors = generateDecimalDistractors(roundedCorrect, numDistractors, displayDecimalPlaces);

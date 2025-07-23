@@ -47,8 +47,12 @@ export interface PracticeSettings {
   fractionNumeratorUpper?: number;
   fractionDenominatorLower?: number; // Should be > 0
   fractionDenominatorUpper?: number;
-  // Specific for decimals
-  decimalPlaces?: number; // Number of decimal places for operands and results
+  // Specific for decimals - separate settings for each operation
+  decimalPlaces?: number; // Legacy - kept for backward compatibility
+  decimalAdditionPlaces?: number;
+  decimalSubtractionPlaces?: number;
+  decimalMultiplicationPlaces?: number;
+  decimalDivisionPlaces?: number;
 }
 
 export type AllPracticeSettings = {

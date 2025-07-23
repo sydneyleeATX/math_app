@@ -245,15 +245,32 @@ const SettingsForm: React.FC<SettingsFormProps> = ({ initialSettings, onStartPra
                     </div>
                   </div>
                   <div className="mt-4">
-                      <label htmlFor={`${op}-decimal-places`} className="block text-sm font-medium text-gray-700">Number of Decimal Places (1-5)</label>
-                      <input type="number" id={`${op}-decimal-places`} min="1" max="5" value={opSettings.decimalPlaces ?? ''} onChange={e => handleInputChange(op, 'decimalPlaces', e.target.value)} className="number-input mt-1 block w-full p-2 border-gray-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500 sm:text-sm"/>
+                    <p className="text-sm font-medium text-gray-700 mb-3">Decimal Places for Each Operation (1-5):</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label htmlFor={`${op}-addition-places`} className="block text-xs font-medium text-gray-600">Addition (+)</label>
+                        <input type="number" id={`${op}-addition-places`} min="1" max="5" value={opSettings.decimalAdditionPlaces ?? ''} onChange={e => handleInputChange(op, 'decimalAdditionPlaces', e.target.value)} className="number-input mt-1 block w-full p-2 border-gray-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500 sm:text-sm"/>
+                      </div>
+                      <div>
+                        <label htmlFor={`${op}-subtraction-places`} className="block text-xs font-medium text-gray-600">Subtraction (-)</label>
+                        <input type="number" id={`${op}-subtraction-places`} min="1" max="5" value={opSettings.decimalSubtractionPlaces ?? ''} onChange={e => handleInputChange(op, 'decimalSubtractionPlaces', e.target.value)} className="number-input mt-1 block w-full p-2 border-gray-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500 sm:text-sm"/>
+                      </div>
+                      <div>
+                        <label htmlFor={`${op}-multiplication-places`} className="block text-xs font-medium text-gray-600">Multiplication (×)</label>
+                        <input type="number" id={`${op}-multiplication-places`} min="1" max="5" value={opSettings.decimalMultiplicationPlaces ?? ''} onChange={e => handleInputChange(op, 'decimalMultiplicationPlaces', e.target.value)} className="number-input mt-1 block w-full p-2 border-gray-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500 sm:text-sm"/>
+                      </div>
+                      <div>
+                        <label htmlFor={`${op}-division-places`} className="block text-xs font-medium text-gray-600">Division (÷)</label>
+                        <input type="number" id={`${op}-division-places`} min="1" max="5" value={opSettings.decimalDivisionPlaces ?? ''} onChange={e => handleInputChange(op, 'decimalDivisionPlaces', e.target.value)} className="number-input mt-1 block w-full p-2 border-gray-300 rounded-md shadow-sm focus:ring-sky-500 focus:border-sky-500 sm:text-sm"/>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">Leave blank to use default (1 decimal place)</p>
                   </div>
                 </>
             );
         default: return null;
     }
   }
-
 
   return (
     <div className="bg-white p-6 sm:p-8 rounded-xl shadow-2xl max-w-2xl mx-auto w-full">
