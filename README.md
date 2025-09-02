@@ -1,6 +1,6 @@
 # Math Whiz
 
-## 🎯 Objective
+## Objective
 When my favorite math flashcards app updated, it lost the simple and effective functionality I used every day. Instead of giving up on it, I decided to rebuild it myself.  
 
 Using **JavaScript, React, Vite, TypeScript, GitHub, and AI tools**, I developed **Math Whiz** — a customizable and adaptive math flashcard app. Along the way, I added new features like **fraction operations** and **performance tracking**, creating a more powerful and versatile learning tool.  
@@ -9,7 +9,7 @@ The goal: provide an adaptable resource for practicing mental math while strengt
 
 ---
 
-## 🧮 Core Functionality
+## Core Functionality
 At its core, Math Whiz is a dynamic flashcard system for arithmetic practice.  
 
 - **Adjustable Arithmetic Styles**: Supports addition, subtraction, multiplication, division, fractions, decimals, exponents, and square roots.  
@@ -22,5 +22,5 @@ At its core, Math Whiz is a dynamic flashcard system for arithmetic practice.
 
 ---
 
-## 📱 Progressive Web App (PWA) Features
+## Progressive Web App (PWA) Features
 Math Whiz is implemented as a **Progressive Web Application (PWA)** for a seamless, app-like expe
