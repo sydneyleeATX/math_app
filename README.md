@@ -23,4 +23,4 @@ At its core, Math Whiz is a dynamic flashcard system for arithmetic practice.
 ---
 
 ## Progressive Web App (PWA) Features
-Math Whiz is implemented as a Progressive Web Application (PWA) for a seamless, app-like expe
+Math Whiz is implemented as a Progressive Web Application (PWA) for a seamless, app-like experience
