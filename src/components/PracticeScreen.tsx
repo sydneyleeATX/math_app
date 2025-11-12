@@ -1,22 +1,23 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { type Question, type Answer, type OperationType, type AllPracticeSettings, type PracticeStat } from '../types';
+import { type Question, type Answer, type OperationType, type AllPracticeSettings, type PracticeStat, AnswerFormat } from '../types';
 import { generateQuestion, areAnswersEqual, getRandomInt } from '../utils/mathHelpers';
 import QuestionCard from './QuestionCard';
+import OpenEndedQuestionCard from './OpenEndedQuestionCard';
 
 interface PracticeScreenProps {
   operations: OperationType[];
   allSettings: AllPracticeSettings;
+  answerFormat: AnswerFormat;
   onEndPractice: (stats: PracticeStat[], totalTimeMs: number) => void;
 }
 
-const PracticeScreen: React.FC<PracticeScreenProps> = ({ operations, allSettings, onEndPractice }) => {
+const PracticeScreen: React.FC<PracticeScreenProps> = ({ operations, allSettings, answerFormat, onEndPractice }) => {
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [incorrectAnswers, setIncorrectAnswers] = useState(0);
   const [elapsedTimeMs, setElapsedTimeMs] = useState(0);
   const [questionStartTimeMs, setQuestionStartTimeMs] = useState(0);
   const [practiceStats, setPracticeStats] = useState<PracticeStat[]>([]);
-  // const [answeredState, setAnsweredState] = useState<{ answer: Answer | null; correct: boolean | null } | null>(null); // Removed
   const [currentOperationForQuestion, setCurrentOperationForQuestion] = useState<OperationType | null>(null);
 
   const loadNextQuestion = useCallback(() => {
@@ -25,7 +26,6 @@ const PracticeScreen: React.FC<PracticeScreenProps> = ({ operations, allSettings
         onEndPractice([], elapsedTimeMs); 
         return;
     }
-    // setAnsweredState(null); // No longer needed
     const randomOpIndex = getRandomInt(0, operations.length - 1);
     const selectedOp = operations[randomOpIndex];
     const settingsForOp = allSettings[selectedOp];
@@ -58,8 +58,6 @@ const PracticeScreen: React.FC<PracticeScreenProps> = ({ operations, allSettings
 
     const timeTakenMs = Date.now() - questionStartTimeMs;
     const isCorrect = areAnswersEqual(selectedAnswer, currentQuestion.correctAnswer, currentQuestion.decimalPlaces);
-
-    // setAnsweredState({ answer: selectedAnswer, correct: isCorrect }); // No longer needed for UI delay
 
     if (isCorrect) {
       setCorrectAnswers(prev => prev + 1);
@@ -127,11 +125,16 @@ const PracticeScreen: React.FC<PracticeScreenProps> = ({ operations, allSettings
         </div>
       </div>
 
-      {currentQuestion && (
+      {currentQuestion && answerFormat === AnswerFormat.MULTIPLE_CHOICE && (
         <QuestionCard 
           question={currentQuestion} 
           onAnswerSelect={handleAnswerSelect}
-          // answeredState prop removed
+        />
+      )}
+      {currentQuestion && answerFormat === AnswerFormat.OPEN_ENDED && (
+        <OpenEndedQuestionCard 
+          question={currentQuestion} 
+          onAnswerSubmit={(answer, isCorrect) => handleAnswerSelect(answer)}
         />
       )}
       {!currentQuestion && operations.length > 0 && (

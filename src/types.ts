@@ -59,6 +59,11 @@ export type AllPracticeSettings = {
   [key in OperationType]: PracticeSettings;
 };
 
+export enum AnswerFormat {
+  MULTIPLE_CHOICE = 'Multiple Choice',
+  OPEN_ENDED = 'Open Ended',
+}
+
 export enum GameState {
   SETTINGS = 'SETTINGS',
   PRACTICING = 'PRACTICING',

@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { GameState, OperationType, type PracticeSettings, type AllPracticeSettings, type PracticeStat, type FinalStats, ALL_OPERATIONS } from './types';
+import { GameState, OperationType, type PracticeSettings, type AllPracticeSettings, type PracticeStat, type FinalStats, ALL_OPERATIONS, AnswerFormat } from './types';
 import Header from './components/Header';
 import SettingsForm, { initialGlobalSettings } from './components/SettingsForm';
 import PracticeScreen from './components/PracticeScreen';
@@ -34,6 +34,7 @@ const App: React.FC = () => {
   console.log('[DEBUG] App rendering, gameState:', gameState);
   const [activeOperations, setActiveOperations] = useState<OperationType[] | null>(null);
   const [activePracticeAllSettings, setActivePracticeAllSettings] = useState<AllPracticeSettings | null>(null);
+  const [activeAnswerFormat, setActiveAnswerFormat] = useState<AnswerFormat>(AnswerFormat.MULTIPLE_CHOICE);
   const savedSettings = localStorage.getItem('mathAppSettings');
 const [allSettings, setAllSettings] = useState<AllPracticeSettings>(
   savedSettings ? JSON.parse(savedSettings) : initialGlobalSettings
@@ -47,9 +48,10 @@ const [allSettings, setAllSettings] = useState<AllPracticeSettings>(
     localStorage.setItem('mathAppSettings', JSON.stringify(allSettings));
   }, [allSettings]);
 
-  const handleStartPractice = useCallback((operations: OperationType[], settings: AllPracticeSettings) => {
+  const handleStartPractice = useCallback((operations: OperationType[], settings: AllPracticeSettings, answerFormat: AnswerFormat) => {
     setActiveOperations(operations);
     setActivePracticeAllSettings(settings);
+    setActiveAnswerFormat(answerFormat);
     setAllSettings(settings); // Keep global settings state updated
     setGameState(GameState.PRACTICING);
   }, []);
@@ -94,7 +96,7 @@ const [allSettings, setAllSettings] = useState<AllPracticeSettings>(
         return <SettingsForm initialSettings={allSettings} onStartPractice={handleStartPractice} />;
       case GameState.PRACTICING:
         if (activeOperations && activeOperations.length > 0 && activePracticeAllSettings) {
-          return <PracticeScreen operations={activeOperations} allSettings={activePracticeAllSettings} onEndPractice={handleEndPractice} />;
+          return <PracticeScreen operations={activeOperations} allSettings={activePracticeAllSettings} answerFormat={activeAnswerFormat} onEndPractice={handleEndPractice} />;
         }
         // Fallback if state is inconsistent
         setGameState(GameState.SETTINGS); 

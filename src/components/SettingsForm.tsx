@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { OperationType, type AllPracticeSettings, type PracticeSettings, ALL_OPERATIONS } from '../types';
+import { OperationType, type AllPracticeSettings, type PracticeSettings, ALL_OPERATIONS, AnswerFormat } from '../types';
 
 interface SettingsFormProps {
   initialSettings: AllPracticeSettings;
-  onStartPractice: (operations: OperationType[], settings: AllPracticeSettings) => void;
+  onStartPractice: (operations: OperationType[], settings: AllPracticeSettings, answerFormat: AnswerFormat) => void;
 }
 
 const defaultSettingsForOperation = (op: OperationType): PracticeSettings => {
@@ -28,6 +28,7 @@ const defaultSettingsForOperation = (op: OperationType): PracticeSettings => {
 const SettingsForm: React.FC<SettingsFormProps> = ({ initialSettings, onStartPractice }) => {
   const [currentSettings, setCurrentSettings] = useState<AllPracticeSettings>(initialSettings);
   const [selectedOperations, setSelectedOperations] = useState<OperationType[]>([ALL_OPERATIONS[0]]);
+  const [answerFormat, setAnswerFormat] = useState<AnswerFormat>(AnswerFormat.MULTIPLE_CHOICE);
 
   // Sync currentSettings with initialSettings when prop changes
   useEffect(() => {
@@ -135,7 +136,7 @@ const SettingsForm: React.FC<SettingsFormProps> = ({ initialSettings, onStartPra
         }
       }
     }
-    onStartPractice(selectedOperations, settingsToSubmit);
+    onStartPractice(selectedOperations, settingsToSubmit, answerFormat);
   };
 
   const renderLimitInputs = (op: OperationType, opSettings: PracticeSettings) => {
@@ -293,6 +294,36 @@ const SettingsForm: React.FC<SettingsFormProps> = ({ initialSettings, onStartPra
                 <span id={`label-${op}`} className="text-sm font-medium text-gray-700">{op}</span>
               </label>
             ))}
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-lg font-medium text-gray-800 mb-2">
+            Answer Format
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <label className="flex items-center space-x-2 p-3 border border-gray-300 rounded-md hover:bg-sky-50 cursor-pointer transition-colors">
+              <input
+                type="radio"
+                name="answerFormat"
+                checked={answerFormat === AnswerFormat.MULTIPLE_CHOICE}
+                onChange={() => setAnswerFormat(AnswerFormat.MULTIPLE_CHOICE)}
+                className="form-radio h-5 w-5 text-sky-600 focus:ring-sky-500"
+                aria-labelledby="label-multiple-choice"
+              />
+              <span id="label-multiple-choice" className="text-sm font-medium text-gray-700">{AnswerFormat.MULTIPLE_CHOICE}</span>
+            </label>
+            <label className="flex items-center space-x-2 p-3 border border-gray-300 rounded-md hover:bg-sky-50 cursor-pointer transition-colors">
+              <input
+                type="radio"
+                name="answerFormat"
+                checked={answerFormat === AnswerFormat.OPEN_ENDED}
+                onChange={() => setAnswerFormat(AnswerFormat.OPEN_ENDED)}
+                className="form-radio h-5 w-5 text-sky-600 focus:ring-sky-500"
+                aria-labelledby="label-open-ended"
+              />
+              <span id="label-open-ended" className="text-sm font-medium text-gray-700">{AnswerFormat.OPEN_ENDED}</span>
+            </label>
           </div>
         </div>
 
